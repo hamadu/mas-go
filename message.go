@@ -1,13 +1,8 @@
-package main
-
-import (
-	"time"
-	"math/rand"
-	"log"
-)
+package mas
 
 type Message struct {
 	From        Agent
 	Task        Task
-	Box         chan int
+	BoxA        chan int
+	BoxB        chan int
 }
