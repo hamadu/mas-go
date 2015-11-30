@@ -18,25 +18,24 @@ type Agent struct {
 
 const RATE = 0.1
 
-func (a *Agent) TryProcessTask() {
+func (a *Agent) ProcessLeaderTask() {
 	for {
-		if a.Ability <= 5 {
-			res := a.tryFetchTask()
-			if res == 1 {
-				return
-			}
-		} else {
-			a.tryReceiveTask()
+		res := a.tryFetchTask()
+		if res == 1 {
+			return
 		}
+	}
+}
+
+func (a *Agent) ProcessWorkerTask() {
+	for {
+		a.tryReceiveTask()
 	}
 }
 
 func (a *Agent) pickRequestAgent() Agent {
 	sum := 0.0
-	for _, v := range a.E.Agents {
-		if v.Name == a.Name || v.Ability <= 5 {
-			continue
-		}
+	for _, v := range a.E.WorkerAgents {
 		val, ok := a.RequestRel[v.Name]
 		if !ok {
 			a.RequestRel[v.Name] = 0.5
@@ -46,25 +45,19 @@ func (a *Agent) pickRequestAgent() Agent {
 	}
 	r := rand.Float64() * sum
 
-	for _, v := range a.E.Agents {
-		if v.Name == a.Name || v.Ability <= 5 {
-			continue
-		}
+	for _, v := range a.E.WorkerAgents {
 		val := a.RequestRel[v.Name]
 		if r < val {
 			return v
 		}
 		r -= val
 	}
-	panic("another agent doesnt seem to exsit")
+	panic("worker agent doesnt seem to exsit")
 }
 
 func (a *Agent) pickResponseAgent() Agent {
 	sum := 0.0
-	for _, v := range a.E.Agents {
-		if v.Name == a.Name || v.Ability >= 5 {
-			continue
-		}
+	for _, v := range a.E.LeaderAgents {
 		val, ok := a.ResponseRel[v.Name]
 		if !ok {
 			a.ResponseRel[v.Name] = 0.5
@@ -74,17 +67,14 @@ func (a *Agent) pickResponseAgent() Agent {
 	}
 	r := rand.Float64() * sum
 
-	for _, v := range a.E.Agents {
-		if v.Name == a.Name || v.Ability >= 5 {
-			continue
-		}
+	for _, v := range a.E.LeaderAgents {
 		val := a.ResponseRel[v.Name]
 		if r < val {
 			return v
 		}
 		r -= val
 	}
-	panic("another agent doesnt seem to exsit")
+	panic("leader agent doesnt seem to exsit")
 }
 
 func (a *Agent) doitWithoutOther(t Task, b Agent) {
