@@ -8,7 +8,6 @@ import (
 type Agent struct {
 	Name  		string
 	Ability		int
-	Score 		int
 	E           *Environment
 	Request     chan Message
 
@@ -16,7 +15,7 @@ type Agent struct {
 	ResponseRel map[string]float64
 }
 
-const RATE = 0.1
+const RATE = 0.0
 
 func (a *Agent) ProcessLeaderTask() {
 	for {
@@ -82,7 +81,6 @@ func (a *Agent) doitWithoutOther(t Task, b Agent) {
 	time.Sleep(time.Duration(wait))
 	a.E.Score += wait / 1000 / 1000
 
-	a.Score += t.Difficulty
 	a.RequestRel[b.Name] = (1.0 - RATE) * a.RequestRel[b.Name]
 }
 
@@ -91,7 +89,6 @@ func (a *Agent) doitWithOther(t Task, b Agent) {
 	time.Sleep(time.Duration(wait))
 	a.E.Score += wait / 1000 / 1000
 
-	a.Score += t.Difficulty * 2
 	a.RequestRel[b.Name] = (1.0 - RATE) * a.RequestRel[b.Name] + RATE
 }
 
@@ -100,7 +97,6 @@ func (a *Agent) doitWithOtherRequest(t Task, b Agent) {
 	time.Sleep(time.Duration(wait))
 	a.E.Score += wait / 1000 / 1000
 
-	a.Score += t.Difficulty * 2
 	a.ResponseRel[b.Name] = (1.0 - RATE) * a.ResponseRel[b.Name] + RATE
 }
 
@@ -113,7 +109,7 @@ func (a *Agent) tryFetchTask() int {
 	select {
 	case t = <- a.E.TaskQueue:
 	default:
-		a.E.FinishQueue <- a.Score
+		a.E.FinishQueue <- 1
 		return 1
 	}
 

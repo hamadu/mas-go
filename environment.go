@@ -16,7 +16,6 @@ func (e *Environment) GenerateLeaderAgent(name string, a int) {
 	e.LeaderAgents = append(e.LeaderAgents, Agent{
 		name,
 		a,
-		0,
 		e,
 		make(chan Message, 100000),
 		map[string]float64{},
@@ -28,7 +27,6 @@ func (e *Environment) GenerateWorkerAgent(name string, a int) {
 	e.WorkerAgents = append(e.WorkerAgents, Agent{
 		name,
 		a,
-		0,
 		e,
 		make(chan Message, 100000),
 		map[string]float64{},
